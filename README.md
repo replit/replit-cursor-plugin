@@ -45,6 +45,7 @@ replit-cursor-plugin/
 │   └── plugin.json          # The plugin's ID card: name, version, description
 ├── mcp.json                 # Tells Cursor how to reach Replit's MCP server
 ├── README.md
+├── LICENSE                  # MIT license for this plugin package
 └── architecture.md          # Diagram of how the pieces connect
 ```
 
@@ -90,7 +91,7 @@ After any edit, reload the window again to pick up changes.
 
 ### 4. Submit to the Cursor Marketplace
 
-Before submission, confirm the license with the repository owner and complete the local sign-in and tool-call test above. Endpoint reachability alone does not verify the complete Cursor integration.
+Before submission, complete the local sign-in and tool-call test above. Endpoint reachability alone does not verify the complete Cursor integration.
 
 Before announcing availability in Cursor / Grok Bot, also confirm Grok Bot distribution and test its sign-in and a read-only tool call with the partner team. Passing the Cursor test does not establish Grok Bot compatibility.
 
@@ -106,4 +107,5 @@ Once the plugin files are merged and publicly available, submit the repository l
 
 ## License
 
-To be decided.
+This plugin package is licensed under the [MIT License](LICENSE). This license
+covers the files in this repository, not Replit's hosted service.
