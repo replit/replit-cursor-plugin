@@ -1,22 +1,24 @@
-# Replit Plugin for Cursor
+# Replit Plugin for Cursor / Grok Bot
 
-Build, update, and publish Replit apps without leaving Cursor.
+Build, update, and publish Replit apps from Cursor / Grok Bot.
 
-This plugin connects Cursor's AI agent to Replit. You describe an app in plain language inside Cursor, and Replit builds it, hosts it, and gives you a live link.
+This plugin is intended to connect Cursor / Grok Bot to Replit. You describe an app in plain language, and Replit builds it, hosts it, and gives you a live link.
 
 > **Status:** Early development. Nothing is published to the Cursor Marketplace yet.
+
+The intended distribution path for Cursor / Grok Bot is the Cursor Marketplace submission. Grok Bot availability and end-to-end behavior still need partner confirmation. The local setup instructions below are specific to Cursor.
 
 ---
 
 ## What it does
 
-Once installed, you can ask Cursor's agent things like:
+Once installed and authenticated in a supported client, you can ask Cursor / Grok Bot things like:
 
 - "Make me a Replit app that tracks my team's weekly goals"
 - "Find my Replit app called *Budget Tracker* and add a dark mode"
 - "Publish my latest Replit app and give me the link"
 
-Under the hood, the plugin gives Cursor access to Replit's **MCP server** (MCP = Model Context Protocol, a standard way for AI tools to talk to other services).
+Under the hood, the plugin connects the client to Replit's **MCP server** (MCP = Model Context Protocol, a standard way for AI tools to talk to other services).
 
 ### Replit tools the agent can use
 
@@ -50,7 +52,7 @@ Cursor discovers the MCP server configuration from the root `mcp.json`.
 
 ---
 
-## Getting started
+## Getting started in Cursor
 
 ### 1. What you need
 
@@ -89,6 +91,8 @@ After any edit, reload the window again to pick up changes.
 ### 4. Submit to the Cursor Marketplace
 
 Before submission, confirm the license with the repository owner and complete the local sign-in and tool-call test above. Endpoint reachability alone does not verify the complete Cursor integration.
+
+Before announcing availability in Cursor / Grok Bot, also confirm Grok Bot distribution and test its sign-in and a read-only tool call with the partner team. Passing the Cursor test does not establish Grok Bot compatibility.
 
 Once the plugin files are merged and publicly available, submit the repository link at [cursor.com/marketplace/publish](https://cursor.com/marketplace/publish). Submission starts Cursor's review; it does not immediately publish the plugin.
 

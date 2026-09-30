@@ -1,10 +1,12 @@
 # Architecture
 
+Intended integration flow for Cursor / Grok Bot. Grok Bot distribution and end-to-end behavior remain to be confirmed with the partner team.
+
 ```mermaid
 flowchart LR
-    User([You, in Cursor]) --> Agent[Cursor AI Agent]
+    User([You, in Cursor / Grok Bot]) --> Agent[Cursor / Grok Bot]
 
-    subgraph Plugin[Replit Cursor Plugin]
+    subgraph Plugin[Replit Plugin for Cursor / Grok Bot]
         Manifest[.cursor-plugin/plugin.json]
         MCPConfig[mcp.json]
     end
@@ -19,8 +21,8 @@ flowchart LR
 
 ## The pieces
 
-- **You, in Cursor** — you type what you want in Cursor's agent chat.
-- **Cursor AI Agent** — Cursor's built-in assistant. It decides when to use Replit.
+- **You, in Cursor / Grok Bot** — you describe what you want in the client's chat.
+- **Cursor / Grok Bot** — the client assistant that uses Replit's MCP tools.
 - **plugin.json** — the plugin's ID card (name, version, description). Cursor uses it to recognize the plugin.
 - **mcp.json** — tells Cursor where Replit's server lives. No keys stored here.
 - **Replit MCP Server** — Replit's online service that accepts requests from AI tools. You sign in once through your browser.
