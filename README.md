@@ -35,26 +35,18 @@ Under the hood, the plugin gives Cursor access to Replit's **MCP server** (MCP =
 
 ## Project layout
 
-This is a **Cursor Plugin** (the Cursor-specific format, which supports rules and commands in addition to MCP servers and skills).
+This is an MCP-only **Cursor Plugin**. It configures the existing Replit MCP server; it does not bundle rules, skills, commands, or a logo.
 
 ```
 replit-cursor-plugin/
 ├── .cursor-plugin/
 │   └── plugin.json          # The plugin's ID card: name, version, description
 ├── mcp.json                 # Tells Cursor how to reach Replit's MCP server
-├── rules/
-│   └── replit.mdc           # Standing guidance: when and how to use Replit
-├── skills/
-│   └── build-on-replit/
-│       └── SKILL.md         # Step-by-step playbook for build → iterate → publish
-├── commands/                # (optional) Shortcut commands, e.g. /replit-publish
-├── assets/
-│   └── logo.png             # Marketplace icon
 ├── README.md
 └── architecture.md          # Diagram of how the pieces connect
 ```
 
-Cursor finds the rules, skills, and commands automatically from these folder names. You don't need to list them in `plugin.json`.
+Cursor discovers the MCP server configuration from the root `mcp.json`.
 
 ---
 
@@ -66,102 +58,39 @@ Cursor finds the rules, skills, and commands automatically from these folder nam
 - A [Replit](https://replit.com) account
 - Git
 
-### 2. Clone the repo
+### 2. Install the files for local testing
 
-```bash
-git clone https://github.com/replit/replit-cursor-plugin.git
-```
-
-### 3. Create the starter files
-
-The repo is empty right now. These are the minimum files to get a working plugin.
-
-**`.cursor-plugin/plugin.json`**
-
-```json
-{
-  "name": "replit",
-  "displayName": "Replit",
-  "description": "Build, update, and publish Replit apps from Cursor.",
-  "version": "0.1.0",
-  "author": { "name": "Replit" },
-  "homepage": "https://replit.com",
-  "repository": "https://github.com/replit/replit-cursor-plugin"
-}
-```
-
-Only `name` is strictly required. The rest helps the Marketplace listing.
-
-**`mcp.json`**
-
-```json
-{
-  "mcpServers": {
-    "replit": {
-      "url": "https://mcp.replit.com/server/mcp"
-    }
-  }
-}
-```
-
-No API key goes here. The first time the agent uses a Replit tool, Cursor opens a Replit sign-in page in your browser (this is called OAuth: you log in on Replit's site, and Cursor gets permission without ever seeing your password).
-
-**`rules/replit.mdc`**
-
-```markdown
----
-description: When to use Replit for building and hosting apps
-alwaysApply: false
----
-
-- When the user wants something they can run and share (app, website, prototype,
-  dashboard, game, internal tool), offer to build it on Replit.
-- Work on one Replit app at a time. Before creating a new one, check whether the
-  user means an existing app (use `resolve_app_by_name` or `search_apps`).
-- Use `ask_question` for questions about an app; only use `update_app_using_prompt`
-  when the user asks for a change.
-- After `publish_app`, call `get_publish_status` and share the live link.
-```
-
-**`skills/build-on-replit/SKILL.md`**
-
-```markdown
----
-name: build-on-replit
-description: Build a new app on Replit, iterate on it, and publish it.
----
-
-1. Clarify what the user wants to build and pick the right app type.
-2. Call `create_app_from_prompt` with a clear description.
-3. Share the app link. Ask what to change.
-4. For each change, call `update_app_using_prompt`.
-5. When the user is happy, call `publish_app`, then `get_publish_status`
-   until it's live. Share the public URL.
-```
-
-### 4. Try it in Cursor (local testing)
-
-Link your copy into Cursor's local plugins folder so edits show up right away:
+Clone the plugin directly into Cursor's local plugins directory:
 
 ```bash
 mkdir -p ~/.cursor/plugins/local
+git clone https://github.com/replit/replit-cursor-plugin.git ~/.cursor/plugins/local/replit
 ```
 
-```bash
-ln -s "$(pwd)/replit-cursor-plugin" ~/.cursor/plugins/local/replit
-```
+Until the metadata PR is merged, check out its branch in that clone before testing. If the target directory already exists, use that checkout rather than cloning over it.
+
+Alternatively, copy the plugin files into `~/.cursor/plugins/local/replit`, including the hidden `.cursor-plugin` directory. Do not use a symlink to a repository outside the local plugins directory: Cursor skips those symlinks.
+
+On Teams and Enterprise, your administrator must allow **Local Plugin Imports** under Dashboard → Settings → Security & Identity → Marketplace and Plugins. This setting is off by default on Enterprise.
+
+### 3. Authenticate and test in Cursor
 
 Then in Cursor:
 
 1. Open the Command Palette (`Cmd+Shift+P`) and run **Developer: Reload Window**.
-2. Open the **Customize** panel and check that the Replit plugin, its rule, and its skill appear.
-3. In the agent chat, try: *"List my Replit apps."* Sign in to Replit when asked.
+2. Open the **Customize** panel and check that the Replit plugin and its MCP server appear.
+3. Authenticate the Replit MCP server when prompted. Sign in to Replit, choose the workspace you want to connect, and review the requested access.
+4. In the agent chat, try: *"List my Replit apps."* Confirm that the tool succeeds and returns apps you can edit (or an empty list if there are none).
+
+The plugin connects to `https://mcp.replit.com/server/mcp` using Streamable HTTP and OAuth protected-resource discovery. No API keys or custom authentication headers belong in the plugin files.
 
 After any edit, reload the window again to pick up changes.
 
-### 5. Publish to the Cursor Marketplace
+### 4. Submit to the Cursor Marketplace
 
-When it's ready, submit it at [cursor.com/marketplace/publish](https://cursor.com/marketplace/publish).
+Before submission, confirm the license with the repository owner and complete the local sign-in and tool-call test above. Endpoint reachability alone does not verify the complete Cursor integration.
+
+Once the plugin files are merged and publicly available, submit the repository link at [cursor.com/marketplace/publish](https://cursor.com/marketplace/publish). Submission starts Cursor's review; it does not immediately publish the plugin.
 
 ---
 
@@ -170,7 +99,6 @@ When it's ready, submit it at [cursor.com/marketplace/publish](https://cursor.co
 - [Cursor plugin docs](https://cursor.com/docs/plugins)
 - [Cursor MCP docs](https://cursor.com/docs/mcp)
 - [Replit MCP server docs](https://docs.replit.com/platforms/mcp-server)
-- [Connect to Replit via MCP](https://docs.replit.com/build/connect-via-mcp)
 
 ## License
 
