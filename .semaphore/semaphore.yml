@@ -1,0 +1,49 @@
+version: v1.0
+name: Secrets Scan
+agent:
+  machine:
+    type: s1-web
+    os_image: ''
+fail_fast:
+  stop:
+    when: branch != 'main'
+auto_cancel:
+  running:
+    when: branch != 'main'
+  queued:
+    when: branch = 'main'
+blocks:
+  - name: Secrets Scan
+    dependencies: []
+    task:
+      secrets:
+        - name: wiz-cli-credentials
+      jobs:
+        - name: Wiz secrets scan
+          commands:
+            - checkout
+            - |
+              export WIZCLI_DIR="$(mktemp -d /tmp/wizcli.XXXXXXXX)"
+              curl --fail --silent --show-error --location \
+                --proto '=https' --proto-redir '=https' \
+                --connect-timeout 15 --max-time 180 --retry 3 --retry-max-time 600 \
+                --output "$WIZCLI_DIR/wizcli" \
+                https://downloads.wiz.io/v1/wizcli/1.76.0/wizcli-linux-amd64
+              (cd "$WIZCLI_DIR" && printf '%s  wizcli\n' 73ada5df67f93a3787d51df66ffc4dce876d322d3cc446981239fd75d5e6b063 | sha256sum --check --status)
+              chmod 700 "$WIZCLI_DIR/wizcli"
+              "$WIZCLI_DIR/wizcli" version
+            - '"$WIZCLI_DIR/wizcli" auth --id "$WIZ_CLIENT_ID" --secret "$WIZ_CLIENT_SECRET"'
+            - |
+              if [ "$SEMAPHORE_GIT_BRANCH" = "main" ]; then branch_type=default; else branch_type=non-default; fi
+              "$WIZCLI_DIR/wizcli" scan dir . \
+                --name "replit-cursor-plugin-secrets-$SEMAPHORE_WORKFLOW_ID" \
+                --tags team=openint \
+                --tags "repo=$SEMAPHORE_GIT_REPO_SLUG" \
+                --tags "ref=$SEMAPHORE_GIT_BRANCH" \
+                --tags trigger=semaphore \
+                --tags "commit=$SEMAPHORE_GIT_SHA" \
+                --tags "branch_type=$branch_type" \
+                --tags scan_mode=full \
+                --disabled-scanners SAST,Vulnerability,SoftwareSupplyChain,Misconfiguration,SensitiveData,Malware,AIModels \
+                --policies replit-valid-secrets-policy-v1 \
+                --by-policy-hits BLOCK
